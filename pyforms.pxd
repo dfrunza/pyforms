@@ -1,3 +1,6 @@
+cdef extern from "Python.h":
+    cdef void PyEval_InitThreads();
+
 cdef extern from "forms.h":
     ctypedef struct FL_FORM:
         pass
@@ -5,6 +8,100 @@ cdef extern from "forms.h":
     ctypedef struct FL_OBJECT:
         pass
 
+# +-- FL_CLASS
+    ctypedef enum FL_CLASS:
+        FL_INVALID_CLASS,
+        FL_BUTTON,
+        FL_LIGHTBUTTON,
+        FL_ROUNDBUTTON, 
+        FL_ROUND3DBUTTON,
+        FL_CHECKBUTTON,
+        FL_BITMAPBUTTON,
+        FL_PIXMAPBUTTON,
+        FL_BITMAP,
+        FL_PIXMAP,
+        FL_BOX,
+        FL_TEXT,
+        FL_MENU,
+        FL_CHART,
+        FL_CHOICE,
+        FL_COUNTER,
+        FL_SLIDER,
+        FL_VALSLIDER,
+        FL_INPUT,
+        FL_BROWSER,
+        FL_DIAL,
+        FL_TIMER,
+        FL_CLOCK,
+        FL_POSITIONER,
+        FL_FREE,
+        FL_XYPLOT,
+        FL_FRAME,
+        FL_LABELFRAME,
+        FL_CANVAS,
+        FL_GLCANVAS,
+        FL_TABFOLDER,
+        FL_SCROLLBAR,
+        FL_SCROLLBUTTON,
+        FL_MENUBAR,
+        FL_TEXTBOX,
+        FL_LABELBUTTON,
+        FL_COMBOBOX,
+        FL_IMAGECANVAS,
+        FL_THUMBWHEEL,
+        FL_COLORWHEEL,
+        FL_FORMBROWSER,
+        FL_SELECT,
+        FL_NMENU,
+        FL_SPINNER,
+        FL_TBOX,
+        FL_CLASS_END
+# --+
+
+# +-- FL_BOX_TYPE
+    ctypedef enum FL_BOX_TYPE:
+        FL_NO_BOX,
+        FL_UP_BOX,
+        FL_DOWN_BOX,
+        FL_BORDER_BOX,
+        FL_SHADOW_BOX,
+        FL_FRAME_BOX,
+        FL_ROUNDED_BOX,
+        FL_EMBOSSED_BOX,
+        FL_FLAT_BOX,
+        FL_RFLAT_BOX,
+        FL_RSHADOW_BOX,
+        FL_OVAL_BOX,
+        FL_ROUNDED3D_UPBOX,
+        FL_ROUNDED3D_DOWNBOX,
+        FL_OVAL3D_UPBOX,
+        FL_OVAL3D_DOWNBOX,
+        FL_OVAL3D_FRAMEBOX,
+        FL_OVAL3D_EMBOSSEDBOX,
+
+        # for internal use only
+
+        FL_TOPTAB_UPBOX,
+        FL_SELECTED_TOPTAB_UPBOX,
+        FL_BOTTOMTAB_UPBOX,
+        FL_SELECTED_BOTTOMTAB_UPBOX,
+        FL_MAX_BOX_STYLES
+# --+
+
+# +-- Frames types
+    cdef enum:
+        FL_NO_FRAME,
+        FL_UP_FRAME,
+        FL_DOWN_FRAME,
+        FL_BORDER_FRAME,
+        FL_SHADOW_FRAME,
+        FL_ENGRAVED_FRAME,
+        FL_ROUNDED_FRAME,
+        FL_EMBOSSED_FRAME,
+        FL_OVAL_FRAME
+# --+
+
+# +-- FL_PD_COL (Colors)
     ctypedef enum FL_PD_COL:
         FL_BLACK,
         FL_RED,
@@ -182,17 +279,36 @@ cdef extern from "forms.h":
         FL_FREE_COL15,
         FL_FREE_COL16,
         FL_NOCOLOR = 2147483647 # INT_MAX
+# --+
 
     cdef enum:
         FL_FULLBORDER = 1,
         FL_TRANSIENT,
         FL_NOBORDER
 
+    ctypedef enum FL_PLACE:
+        FL_PLACE_FREE       =   0,
+        FL_PLACE_MOUSE      =   1,
+        FL_PLACE_CENTER     =   2,
+        FL_PLACE_POSITION   =   4,
+        FL_PLACE_SIZE       =   8,
+        FL_PLACE_GEOMETRY   =  16,
+        FL_PLACE_ASPECT     =  32,
+        FL_PLACE_FULLSCREEN =  64,
+        FL_PLACE_HOTSPOT    = 128,
+        FL_PLACE_ICONIC     = 256,
+
+        FL_FREE_SIZE        = ( 1 << 14 ),
+        FL_FIX_SIZE         = ( 1 << 15 )
+
     ctypedef int FL_Coord
 
     ctypedef unsigned long FL_COLOR
 
     ctypedef unsigned long XID
+
+    ctypedef union XEvent:
+        pass
 
     void* fl_initialize(int* na, char** arg, const char* appclass, void* appopt, int nappopt);
 
@@ -204,7 +320,11 @@ cdef extern from "forms.h":
 
     XID fl_show_form(FL_FORM* form, int place, int border, const char* name);
 
-    FL_OBJECT* fl_do_forms();
+    # The `nogil` function annotation declares that it is safe to call the function without the GIL.
+    # It is perfectly allowed to execute it while holding the GIL.
+    FL_OBJECT* fl_do_forms() nogil;
+
+    FL_OBJECT* fl_check_forms();
 
     void fl_hide_form(FL_FORM* form);
 
@@ -219,4 +339,14 @@ cdef extern from "forms.h":
     int fl_set_font_name(int n, const char* name);
 
     void fl_set_object_color(FL_OBJECT* obj, FL_COLOR col1, FL_COLOR col2);
+
+    ctypedef int (*FL_APPEVENT_CB)(XEvent*, void*);
+
+    FL_APPEVENT_CB fl_set_idle_callback(FL_APPEVENT_CB callback, void* user_data);
+
+    void fl_set_object_label(FL_OBJECT* obj, const char* label);
+
+    FL_OBJECT* fl_add_box(int type, FL_Coord x, FL_Coord y, FL_Coord w, FL_Coord h, const char* label);
+
+    FL_OBJECT* fl_add_labelframe(int type, FL_Coord x, FL_Coord y, FL_Coord w, FL_Coord h, const char* label);
 
