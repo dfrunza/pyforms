@@ -281,6 +281,21 @@ cdef extern from "forms.h":
         FL_NOCOLOR = 2147483647 # INT_MAX
 # --+
 
+# +-- FL_ALIGN
+    ctypedef enum FL_ALIGN:
+        FL_ALIGN_CENTER,
+        FL_ALIGN_TOP          = 1,
+        FL_ALIGN_BOTTOM       = 2,
+        FL_ALIGN_LEFT         = 4,
+        FL_ALIGN_RIGHT        = 8,
+        FL_ALIGN_LEFT_TOP     = (FL_ALIGN_TOP    | FL_ALIGN_LEFT),
+        FL_ALIGN_RIGHT_TOP    = (FL_ALIGN_TOP    | FL_ALIGN_RIGHT),
+        FL_ALIGN_LEFT_BOTTOM  = (FL_ALIGN_BOTTOM | FL_ALIGN_LEFT),
+        FL_ALIGN_RIGHT_BOTTOM = (FL_ALIGN_BOTTOM | FL_ALIGN_RIGHT),
+        FL_ALIGN_INSIDE       = (1 << 13),
+        FL_ALIGN_VERT         = (1 << 14)    # not functional yet
+# --+
+
     cdef enum:
         FL_FULLBORDER = 1,
         FL_TRANSIENT,
@@ -349,4 +364,18 @@ cdef extern from "forms.h":
     FL_OBJECT* fl_add_box(int type, FL_Coord x, FL_Coord y, FL_Coord w, FL_Coord h, const char* label);
 
     FL_OBJECT* fl_add_labelframe(int type, FL_Coord x, FL_Coord y, FL_Coord w, FL_Coord h, const char* label);
+
+    void fl_set_object_lalign(FL_OBJECT* obj, int align);
+
+    ctypedef void (*FL_CALLBACKPTR)(FL_OBJECT*, long);
+
+    FL_CALLBACKPTR fl_set_object_callback(FL_OBJECT* obj, FL_CALLBACKPTR callback, long argument);
+
+    void fl_deactivate_object(FL_OBJECT* obj);
+
+    void fl_activate_object(FL_OBJECT* obj);
+
+    int fl_object_is_active(FL_OBJECT* obj);
+
+    void fl_set_object_boxtype(FL_OBJECT* obj, int boxtype);
 

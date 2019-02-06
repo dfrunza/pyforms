@@ -296,6 +296,20 @@ PYFL_FREE_SIZE        = FL_FREE_SIZE
 PYFL_FIX_SIZE         = FL_FIX_SIZE
 # --+
 
+# +-- PYFL_ALIGN
+PYFL_ALIGN_CENTER       = FL_ALIGN_CENTER
+PYFL_ALIGN_TOP          = FL_ALIGN_TOP
+PYFL_ALIGN_BOTTOM       = FL_ALIGN_BOTTOM
+PYFL_ALIGN_LEFT         = FL_ALIGN_LEFT
+PYFL_ALIGN_RIGHT        = FL_ALIGN_RIGHT
+PYFL_ALIGN_LEFT_TOP     = FL_ALIGN_LEFT_TOP
+PYFL_ALIGN_RIGHT_TOP    = FL_ALIGN_RIGHT_TOP
+PYFL_ALIGN_LEFT_BOTTOM  = FL_ALIGN_LEFT_BOTTOM
+PYFL_ALIGN_RIGHT_BOTTOM = FL_ALIGN_RIGHT_BOTTOM
+PYFL_ALIGN_INSIDE       = FL_ALIGN_INSIDE
+PYFL_ALIGN_VERT         = FL_ALIGN_VERT
+# --+
+
 PYFL_FULLBORDER = FL_FULLBORDER
 PYFL_TRANSIENT = FL_TRANSIENT
 PYFL_NOBORDER = FL_NOBORDER
@@ -377,13 +391,11 @@ def pyfl_set_font_name(int n, char* name):
 def pyfl_set_object_color(PYFL_OBJECT obj, PYFL_COLOR col1, PYFL_COLOR col2):
     pyforms.fl_set_object_color(obj._handle, col1, col2)
 
-cdef int _pyfl_callback_wrapper(XEvent* xevent, void* user_data) with gil:
-#    cdef PyXEvent py_xevent = PyXEvent()
-#    py_xevent._handle = xevent
+cdef int _pyfl_idle_callback(pyforms.XEvent* xevent, void* user_data) with gil:
     (<object>user_data)()
 
-def pyfl_set_idle_callback(user_callback):
-    fl_set_idle_callback(_pyfl_callback_wrapper, <void*>user_callback)
+def pyfl_set_idle_callback(object user_callback):
+    pyforms.fl_set_idle_callback(_pyfl_idle_callback, <void*>user_callback)
 
 def pyfl_set_object_label(PYFL_OBJECT obj, char* label):
     pyforms.fl_set_object_label(obj._handle, label)
@@ -397,4 +409,26 @@ def pyfl_add_labelframe(int type, PYFL_Coord x, PYFL_Coord y, PYFL_Coord w, PYFL
     cdef PYFL_OBJECT result = PYFL_OBJECT()
     result._handle = pyforms.fl_add_labelframe(type, x, y, w, h, label)
     return result
+
+def pyfl_set_object_lalign(PYFL_OBJECT obj, int align):
+    pyforms.fl_set_object_lalign(obj._handle, align)
+
+cdef void _pyfl_set_object_callback(pyforms.FL_OBJECT* obj, long argument) with gil:
+    (<object>(<void*>argument))()
+
+def pyfl_set_object_callback(PYFL_OBJECT obj, object user_callback):
+    pyforms.fl_set_object_callback(obj._handle, _pyfl_set_object_callback, <long>(<void*>user_callback))
+
+def pyfl_deactivate_object(PYFL_OBJECT obj):
+    pyforms.fl_deactivate_object(obj._handle)
+
+def pyfl_activate_object(PYFL_OBJECT obj):
+    pyforms.fl_activate_object(obj._handle)
+
+def pyfl_object_is_active(PYFL_OBJECT obj):
+    result = pyforms.fl_object_is_active(obj._handle)
+    return (result != 0)
+
+def pyfl_set_object_boxtype(PYFL_OBJECT obj, int boxtype):
+    pyforms.fl_set_object_boxtype(obj._handle, boxtype)
 
