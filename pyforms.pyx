@@ -114,7 +114,7 @@ PYFL_WHITE                = FL_WHITE
 PYFL_TOMATO               = FL_TOMATO
 PYFL_INDIANRED            = FL_INDIANRED
 PYFL_SLATEBLUE            = FL_SLATEBLUE
-PYFL_COL1                 = FL_COL1
+PYFL_COL1                 = FL_COL1         # <<-- default background
 PYFL_RIGHT_BCOL           = FL_RIGHT_BCOL
 PYFL_BOTTOM_BCOL          = FL_BOTTOM_BCOL
 PYFL_TOP_BCOL             = FL_TOP_BCOL
@@ -331,12 +331,10 @@ PYFL_PLACE_MOUSE = 1
 
 ctypedef int PYFL_BORDER
 
-def init_python_threads():
-    pyforms.PyEval_InitThreads()
-
 def pyfl_initialize(char* appclass):
     cdef int argc = 1
     cdef array.array argv = array.array('b', 'pyforms')
+    pyforms.PyEval_InitThreads()
     pyforms.fl_initialize(&argc, <char**>&argv.data.as_voidptr, appclass, <void*>0, 0)
 
 def pyfl_bgn_form(int type, PYFL_Coord w, PYFL_Coord h):
@@ -431,4 +429,7 @@ def pyfl_object_is_active(PYFL_OBJECT obj):
 
 def pyfl_set_object_boxtype(PYFL_OBJECT obj, int boxtype):
     pyforms.fl_set_object_boxtype(obj._handle, boxtype)
+
+def pyfl_set_icm_color(PYFL_COLOR, int r, int g, int b):
+    pyforms.fl_set_icm_color(PYFL_COLOR, r, g, b)
 

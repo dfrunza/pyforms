@@ -3,7 +3,7 @@
 " Get path to ".vimprj" folder
 let s:sPath = expand('<sfile>:p:h')
 
-let g:indexer_ctagsCommandLineOptions="--fields=+iaSl --extra=+q --languages=Python,C"
+let g:indexer_ctagsCommandLineOptions="--fields=+iaSl --extras=+q --languages=Python,C"
 
 " Specify the project's 'indexer_files'"
 let g:indexer_indexerListFilename = s:sPath.'/indexer_files'

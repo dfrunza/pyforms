@@ -379,3 +379,6 @@ cdef extern from "forms.h":
 
     void fl_set_object_boxtype(FL_OBJECT* obj, int boxtype);
 
+    void fl_set_icm_color(FL_COLOR, int r, int g, int b);
+
+
