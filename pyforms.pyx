@@ -331,27 +331,27 @@ PYFL_PLACE_MOUSE = 1
 
 ctypedef int PYFL_BORDER
 
-def pyfl_initialize(char* appclass):
+def pyfl_initialize(str appclass):
     cdef int argc = 1
-    cdef array.array argv = array.array('b', 'pyforms')
+    cdef array.array argv = array.array('b', b'pyforms')
     pyforms.PyEval_InitThreads()
-    pyforms.fl_initialize(&argc, <char**>&argv.data.as_voidptr, appclass, <void*>0, 0)
+    pyforms.fl_initialize(&argc, <char**>&argv.data.as_voidptr, appclass.encode(), <void*>0, 0)
 
 def pyfl_bgn_form(int type, PYFL_Coord w, PYFL_Coord h):
     cdef PYFL_FORM result = PYFL_FORM()
     result._handle = pyforms.fl_bgn_form(type, w, h)
     return result
 
-def pyfl_add_button(int type, PYFL_Coord x, PYFL_Coord y, PYFL_Coord w, PYFL_Coord h, char* label):
+def pyfl_add_button(int type, PYFL_Coord x, PYFL_Coord y, PYFL_Coord w, PYFL_Coord h, str label):
     cdef PYFL_OBJECT result = PYFL_OBJECT()
-    result._handle = pyforms.fl_add_button(type, x, y, w, h, label)
+    result._handle = pyforms.fl_add_button(type, x, y, w, h, label.encode())
     return result
 
 def pyfl_end_form():
     pyforms.fl_end_form()
 
-def pyfl_show_form(PYFL_FORM form, PYFL_PLACE place, PYFL_BORDER border, char* name):
-    cdef PYXID result = pyforms.fl_show_form(form._handle, place, border, name)
+def pyfl_show_form(PYFL_FORM form, PYFL_PLACE place, PYFL_BORDER border, str name):
+    cdef PYXID result = pyforms.fl_show_form(form._handle, place, border, name.encode())
     return result
 
 def pyfl_do_forms():
@@ -375,15 +375,15 @@ def pyfl_get_form_background_color(PYFL_FORM form):
 def pyfl_set_form_background_color(PYFL_FORM form, PYFL_COLOR color):
     pyforms.fl_set_form_background_color(form._handle, color)
 
-def pyfl_set_object_helper(PYFL_OBJECT obj, char* tip):
-    pyforms.fl_set_object_helper(obj._handle, tip)
+def pyfl_set_object_helper(PYFL_OBJECT obj, str tip):
+    pyforms.fl_set_object_helper(obj._handle, tip.encode())
 
 def pyfl_get_font_name(int n):
     result = pyforms.fl_get_font_name(n)
     return result
 
-def pyfl_set_font_name(int n, char* name):
-    result = pyforms.fl_set_font_name(n, name)
+def pyfl_set_font_name(int n, str name):
+    result = pyforms.fl_set_font_name(n, name.encode())
     return result
 
 def pyfl_set_object_color(PYFL_OBJECT obj, PYFL_COLOR col1, PYFL_COLOR col2):
@@ -395,17 +395,17 @@ cdef int _pyfl_idle_callback(pyforms.XEvent* xevent, void* user_data) with gil:
 def pyfl_set_idle_callback(object user_callback):
     pyforms.fl_set_idle_callback(_pyfl_idle_callback, <void*>user_callback)
 
-def pyfl_set_object_label(PYFL_OBJECT obj, char* label):
-    pyforms.fl_set_object_label(obj._handle, label)
+def pyfl_set_object_label(PYFL_OBJECT obj, str label):
+    pyforms.fl_set_object_label(obj._handle, label.encode())
 
-def pyfl_add_box(int type, PYFL_Coord x, PYFL_Coord y, PYFL_Coord w, PYFL_Coord h, char* label):
+def pyfl_add_box(int type, PYFL_Coord x, PYFL_Coord y, PYFL_Coord w, PYFL_Coord h, str label):
     cdef PYFL_OBJECT result = PYFL_OBJECT()
-    result._handle = pyforms.fl_add_box(type, x, y, w, h, label)
+    result._handle = pyforms.fl_add_box(type, x, y, w, h, label.encode())
     return result
 
-def pyfl_add_labelframe(int type, PYFL_Coord x, PYFL_Coord y, PYFL_Coord w, PYFL_Coord h, char* label):
+def pyfl_add_labelframe(int type, PYFL_Coord x, PYFL_Coord y, PYFL_Coord w, PYFL_Coord h, str label):
     cdef PYFL_OBJECT result = PYFL_OBJECT()
-    result._handle = pyforms.fl_add_labelframe(type, x, y, w, h, label)
+    result._handle = pyforms.fl_add_labelframe(type, x, y, w, h, label.encode())
     return result
 
 def pyfl_set_object_lalign(PYFL_OBJECT obj, int align):

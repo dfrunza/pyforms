@@ -1,5 +1,12 @@
 cdef extern from "Python.h":
+    ctypedef struct PyObject:
+        pass
+
     cdef void PyEval_InitThreads();
+
+    # encoding = 'utf-8' | 'ascii' | ..
+    # errors = 'strict' | 'ignore' | ..
+    cdef PyObject* PyUnicode_AsEncodedString(PyObject* unicode, const char* encoding, const char* errors);
 
 cdef extern from "forms.h":
     ctypedef struct FL_FORM:
