@@ -388,4 +388,8 @@ cdef extern from "forms.h":
 
     void fl_set_icm_color(FL_COLOR, int r, int g, int b);
 
+    void fl_hide_object(FL_OBJECT* obj);
+
+    void fl_show_object(FL_OBJECT* obj);
+
 

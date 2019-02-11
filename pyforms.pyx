@@ -433,3 +433,10 @@ def pyfl_set_object_boxtype(PYFL_OBJECT obj, int boxtype):
 def pyfl_set_icm_color(PYFL_COLOR, int r, int g, int b):
     pyforms.fl_set_icm_color(PYFL_COLOR, r, g, b)
 
+def pyfl_hide_object(PYFL_OBJECT obj):
+    pyforms.fl_hide_object(obj._handle)
+
+def pyfl_show_object(PYFL_OBJECT obj):
+    pyforms.fl_show_object(obj._handle)
+
+
