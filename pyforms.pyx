@@ -3,16 +3,6 @@ from cpython cimport array
 import array
 from enum import IntEnum
 
-cdef int _enumval_counter = 0
-
-cdef enumval(int start = -1):
-    global _enumval_counter
-    if start != -1:
-        _enumval_counter = start
-    result = _enumval_counter
-    _enumval_counter += 1
-    return result
-
 cdef class PYFL_FORM:
     cdef pyforms.FL_FORM* _handle
 
@@ -323,8 +313,17 @@ ctypedef unsigned long PYXID
 ctypedef int PYFL_BOX_TYPE
 PYFL_UP_BOX = 1
 
-ctypedef int PYFL_BUTTON_TYPE
-PYFL_NORMAL_BUTTON = enumval(0)
+# +-- PYFL_BUTTON_TYPE
+PYFL_NORMAL_BUTTON     = FL_NORMAL_BUTTON
+PYFL_PUSH_BUTTON       = FL_PUSH_BUTTON
+PYFL_RADIO_BUTTON      = FL_RADIO_BUTTON
+PYFL_HIDDEN_BUTTON     = FL_HIDDEN_BUTTON
+PYFL_TOUCH_BUTTON      = FL_TOUCH_BUTTON
+PYFL_INOUT_BUTTON      = FL_INOUT_BUTTON
+PYFL_RETURN_BUTTON     = FL_RETURN_BUTTON
+PYFL_HIDDEN_RET_BUTTON = FL_HIDDEN_RET_BUTTON
+PYFL_MENU_BUTTON       = FL_MENU_BUTTON
+# --+
 
 ctypedef int PYFL_PLACE
 PYFL_PLACE_MOUSE = 1
@@ -397,6 +396,9 @@ def pyfl_set_idle_callback(object user_callback):
 
 def pyfl_set_object_label(PYFL_OBJECT obj, str label):
     pyforms.fl_set_object_label(obj._handle, label.encode())
+
+def pyfl_set_object_lcolor(PYFL_OBJECT obj, PYFL_COLOR color):
+    pyforms.fl_set_object_lcol(obj._handle, color)
 
 def pyfl_add_box(int type, PYFL_Coord x, PYFL_Coord y, PYFL_Coord w, PYFL_Coord h, str label):
     cdef PYFL_OBJECT result = PYFL_OBJECT()

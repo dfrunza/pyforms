@@ -15,6 +15,19 @@ cdef extern from "forms.h":
     ctypedef struct FL_OBJECT:
         pass
 
+# +-- PYFL_BUTTON_TYPE
+    ctypedef enum FL_BUTTON_TYPE:
+        FL_NORMAL_BUTTON,
+        FL_PUSH_BUTTON,
+        FL_RADIO_BUTTON,
+        FL_HIDDEN_BUTTON,
+        FL_TOUCH_BUTTON,
+        FL_INOUT_BUTTON,
+        FL_RETURN_BUTTON,
+        FL_HIDDEN_RET_BUTTON,
+        FL_MENU_BUTTON
+# --+
+
 # +-- FL_CLASS
     ctypedef enum FL_CLASS:
         FL_INVALID_CLASS,
@@ -367,6 +380,8 @@ cdef extern from "forms.h":
     FL_APPEVENT_CB fl_set_idle_callback(FL_APPEVENT_CB callback, void* user_data);
 
     void fl_set_object_label(FL_OBJECT* obj, const char* label);
+
+    void fl_set_object_lcol(FL_OBJECT* obj, FL_COLOR color);
 
     FL_OBJECT* fl_add_box(int type, FL_Coord x, FL_Coord y, FL_Coord w, FL_Coord h, const char* label);
 
