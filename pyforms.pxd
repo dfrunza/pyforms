@@ -15,7 +15,21 @@ cdef extern from "forms.h":
     ctypedef struct FL_OBJECT:
         pass
 
-# +-- PYFL_BUTTON_TYPE
+    ctypedef struct FL_POPUP_ENTRY:
+        pass
+
+    ctypedef struct FL_POPUP_RETURN:
+        pass
+
+    ctypedef int (*FL_POPUP_CB)(FL_POPUP_RETURN*);
+
+    ctypedef struct FL_POPUP_ITEM:
+        const char* text;               # text of entry
+        FL_POPUP_CB callback;           # (selection) callback
+        const char* shortcut;           # keyboard shortcut description
+        int type;               # type of entry
+        int state;              # disabled, hidden, checked
+
     ctypedef enum FL_BUTTON_TYPE:
         FL_NORMAL_BUTTON,
         FL_PUSH_BUTTON,
@@ -26,9 +40,7 @@ cdef extern from "forms.h":
         FL_RETURN_BUTTON,
         FL_HIDDEN_RET_BUTTON,
         FL_MENU_BUTTON
-# --+
 
-# +-- FL_CLASS
     ctypedef enum FL_CLASS:
         FL_INVALID_CLASS,
         FL_BUTTON,
@@ -76,9 +88,7 @@ cdef extern from "forms.h":
         FL_SPINNER,
         FL_TBOX,
         FL_CLASS_END
-# --+
 
-# +-- FL_BOX_TYPE
     ctypedef enum FL_BOX_TYPE:
         FL_NO_BOX,
         FL_UP_BOX,
@@ -106,9 +116,7 @@ cdef extern from "forms.h":
         FL_BOTTOMTAB_UPBOX,
         FL_SELECTED_BOTTOMTAB_UPBOX,
         FL_MAX_BOX_STYLES
-# --+
 
-# +-- Frames types
     cdef enum:
         FL_NO_FRAME,
         FL_UP_FRAME,
@@ -119,9 +127,7 @@ cdef extern from "forms.h":
         FL_ROUNDED_FRAME,
         FL_EMBOSSED_FRAME,
         FL_OVAL_FRAME
-# --+
 
-# +-- FL_PD_COL (Colors)
     ctypedef enum FL_PD_COL:
         FL_BLACK,
         FL_RED,
@@ -299,9 +305,7 @@ cdef extern from "forms.h":
         FL_FREE_COL15,
         FL_FREE_COL16,
         FL_NOCOLOR = 2147483647 # INT_MAX
-# --+
 
-# +-- FL_ALIGN
     ctypedef enum FL_ALIGN:
         FL_ALIGN_CENTER,
         FL_ALIGN_TOP          = 1,
@@ -314,7 +318,6 @@ cdef extern from "forms.h":
         FL_ALIGN_RIGHT_BOTTOM = (FL_ALIGN_BOTTOM | FL_ALIGN_RIGHT),
         FL_ALIGN_INSIDE       = (1 << 13),
         FL_ALIGN_VERT         = (1 << 14)    # not functional yet
-# --+
 
     cdef enum:
         FL_FULLBORDER = 1,
@@ -335,6 +338,12 @@ cdef extern from "forms.h":
 
         FL_FREE_SIZE        = ( 1 << 14 ),
         FL_FIX_SIZE         = ( 1 << 15 )
+
+    cdef enum:
+        FL_NORMAL_NMENU,
+        FL_NORMAL_TOUCH_NMENU,
+        FL_BUTTON_NMENU,
+        FL_BUTTON_TOUCH_NMENU
 
     ctypedef int FL_Coord
 
@@ -407,4 +416,8 @@ cdef extern from "forms.h":
 
     void fl_show_object(FL_OBJECT* obj);
 
+    FL_OBJECT* fl_add_nmenu(int, FL_Coord, FL_Coord, FL_Coord, FL_Coord, const char*);
 
+    FL_POPUP_ENTRY* fl_add_nmenu_items(FL_OBJECT*, const char*, ...);
+
+    FL_POPUP_ENTRY* fl_set_nmenu_items(FL_OBJECT*, FL_POPUP_ITEM*);
