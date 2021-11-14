@@ -1,34 +1,83 @@
 cdef extern from "Python.h":
-    ctypedef struct PyObject:
-        pass
 
     cdef void PyEval_InitThreads();
 
-    # encoding = 'utf-8' | 'ascii' | ..
-    # errors = 'strict' | 'ignore' | ..
-    cdef PyObject* PyUnicode_AsEncodedString(PyObject* unicode, const char* encoding, const char* errors);
 
 cdef extern from "forms.h":
+
     ctypedef struct FL_FORM:
         pass
+
 
     ctypedef struct FL_OBJECT:
         pass
 
+
+    ctypedef struct FL_POPUP:
+        pass
+
+
     ctypedef struct FL_POPUP_ENTRY:
         pass
 
+
     ctypedef struct FL_POPUP_RETURN:
-        pass
+        long int val             # value assigned to popup entry
+        void* user_data          # pointer to user data
+        const char* text         # text of the selected popup entry
+        const char* label        # left-flushed label part
+        const char* accel        # right-flushed label part
+        const FL_POPUP_ENTRY* entry        # pointer to selected popup entry
+        const FL_POPUP* popup              # popup we're called for
+
 
     ctypedef int (*FL_POPUP_CB)(FL_POPUP_RETURN*);
 
+
     ctypedef struct FL_POPUP_ITEM:
-        const char* text;               # text of entry
-        FL_POPUP_CB callback;           # (selection) callback
-        const char* shortcut;           # keyboard shortcut description
-        int type;               # type of entry
-        int state;              # disabled, hidden, checked
+        const char* text               # text of entry
+        FL_POPUP_CB callback           # (selection) callback
+        const char* shortcut           # keyboard shortcut description
+        int type               # type of entry
+        int state              # disabled, hidden, checked
+
+
+    # Some general constants #
+
+    cdef enum:
+        FL_ON          = 1
+        FL_OK          = 1
+        FL_VALID       = 1
+        FL_PREEMPT     = 1
+        FL_AUTO        = 2
+        FL_WHEN_NEEDED = FL_AUTO
+        FL_OFF         = 0
+        FL_CANCEL      = 0
+        FL_INVALID     = 0
+
+        # WM_DELETE_WINDOW callback return #
+
+        FL_IGNORE      = -1
+
+
+    # Popup states #
+
+    cdef enum:
+        FL_POPUP_NONE     = 0
+        FL_POPUP_DISABLED = 1               # entry is disabled
+        FL_POPUP_HIDDEN   = 2               # entry is temporarily hidden
+        FL_POPUP_CHECKED  = 4               # tooogle/radio item is in on state
+
+
+    # Popup entry types #
+
+    cdef enum:
+        FL_POPUP_NORMAL                     # normal popup entry
+        FL_POPUP_TOGGLE                     # toggle ("binary") popup entry
+        FL_POPUP_RADIO                      # radio popup entry
+        FL_POPUP_SUB                        # sub-popup popup entry
+        FL_POPUP_LINE                       # line popup entry
+
 
     ctypedef enum FL_BUTTON_TYPE:
         FL_NORMAL_BUTTON,
@@ -40,6 +89,7 @@ cdef extern from "forms.h":
         FL_RETURN_BUTTON,
         FL_HIDDEN_RET_BUTTON,
         FL_MENU_BUTTON
+
 
     ctypedef enum FL_CLASS:
         FL_INVALID_CLASS,
@@ -89,6 +139,7 @@ cdef extern from "forms.h":
         FL_TBOX,
         FL_CLASS_END
 
+
     ctypedef enum FL_BOX_TYPE:
         FL_NO_BOX,
         FL_UP_BOX,
@@ -117,6 +168,7 @@ cdef extern from "forms.h":
         FL_SELECTED_BOTTOMTAB_UPBOX,
         FL_MAX_BOX_STYLES
 
+
     cdef enum:
         FL_NO_FRAME,
         FL_UP_FRAME,
@@ -127,6 +179,7 @@ cdef extern from "forms.h":
         FL_ROUNDED_FRAME,
         FL_EMBOSSED_FRAME,
         FL_OVAL_FRAME
+
 
     ctypedef enum FL_PD_COL:
         FL_BLACK,
@@ -306,6 +359,7 @@ cdef extern from "forms.h":
         FL_FREE_COL16,
         FL_NOCOLOR = 2147483647 # INT_MAX
 
+
     ctypedef enum FL_ALIGN:
         FL_ALIGN_CENTER,
         FL_ALIGN_TOP          = 1,
@@ -319,10 +373,12 @@ cdef extern from "forms.h":
         FL_ALIGN_INSIDE       = (1 << 13),
         FL_ALIGN_VERT         = (1 << 14)    # not functional yet
 
+
     cdef enum:
         FL_FULLBORDER = 1,
         FL_TRANSIENT,
         FL_NOBORDER
+
 
     ctypedef enum FL_PLACE:
         FL_PLACE_FREE       =   0,
@@ -339,20 +395,26 @@ cdef extern from "forms.h":
         FL_FREE_SIZE        = ( 1 << 14 ),
         FL_FIX_SIZE         = ( 1 << 15 )
 
+
     cdef enum:
         FL_NORMAL_NMENU,
         FL_NORMAL_TOUCH_NMENU,
         FL_BUTTON_NMENU,
         FL_BUTTON_TOUCH_NMENU
 
+
     ctypedef int FL_Coord
+
 
     ctypedef unsigned long FL_COLOR
 
+
     ctypedef unsigned long XID
+
 
     ctypedef union XEvent:
         pass
+
 
     void* fl_initialize(int* na, char** arg, const char* appclass, void* appopt, int nappopt);
 
@@ -365,7 +427,7 @@ cdef extern from "forms.h":
     XID fl_show_form(FL_FORM* form, int place, int border, const char* name);
 
     # The `nogil` function annotation declares that it is safe to call the function without the GIL.
-    # It is perfectly allowed to execute it while holding the GIL.
+    # Note that it's allowed to execute it while holding the GIL as well.
     FL_OBJECT* fl_do_forms() nogil;
 
     FL_OBJECT* fl_check_forms();
