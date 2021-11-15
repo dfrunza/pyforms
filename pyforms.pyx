@@ -15,6 +15,8 @@ cdef class PYFL_OBJECT:
 
 cdef class PYFL_POPUP_ENTRY:
     cdef FL_POPUP_ENTRY* fl_handle
+    cdef readonly long int val
+    cdef readonly str text
 
 
 cdef class PYFL_POPUP_RETURN:
@@ -22,14 +24,22 @@ cdef class PYFL_POPUP_RETURN:
 
 
 cdef class PYFL_POPUP_ITEM:
-    cdef FL_POPUP_ITEM fl_handle
-    cdef readonly long int val
+    cdef FL_POPUP_ITEM* fl_handle
     cdef public:
         str text
         object callback
         str shortcut
         int type
         int state
+
+    def __cinit__(self):
+        self.fl_handle = <FL_POPUP_ITEM*>PyMem_Malloc(sizeof(FL_POPUP_ITEM))
+        return
+
+    def __dealloc__(self):
+        PyMem_Free(self.fl_handle)
+        self.fl_handle = <FL_POPUP_ITEM*>0
+        return
 
 
 cdef public enum:
@@ -578,20 +588,31 @@ def pyfl_set_nmenu_items(PYFL_OBJECT obj, list items):
         popup_item.fl_handle.type = popup_item.type
         popup_item.fl_handle.state = popup_item.state
 
-        memcpy(fl_items.data.as_uchars + offset, &popup_item.fl_handle, sizeof(FL_POPUP_ITEM))
+        memcpy(fl_items.data.as_uchars + offset, popup_item.fl_handle, sizeof(FL_POPUP_ITEM))
         offset += sizeof(FL_POPUP_ITEM)
 
-    cdef PYFL_POPUP_ENTRY result = PYFL_POPUP_ENTRY()
-    result.fl_handle = fl_set_nmenu_items(obj.fl_handle, <FL_POPUP_ITEM*>fl_items.data.as_voidptr)
-    assert result.fl_handle != <FL_POPUP_ENTRY*>0
-    cdef FL_POPUP_ENTRY* fl_entry = result.fl_handle
+    cdef FL_POPUP_ENTRY* fl_popup_entries = fl_set_nmenu_items(obj.fl_handle, <FL_POPUP_ITEM*>fl_items.data.as_voidptr)
+    assert fl_popup_entries != <FL_POPUP_ENTRY*>0
+    result = []
+    cdef FL_POPUP_ENTRY* fl_entry = fl_popup_entries
+    cdef PYFL_POPUP_ENTRY pyfl_entry
     i = 0
     while fl_entry != <FL_POPUP_ENTRY*>0:
         popup_item = items[i]
         assert fl_entry.callback == &_pyfl_nmenu_popup_item_callback
         fl_entry.user_data = <void*>popup_item.callback
-        popup_item.val = fl_entry.val
+
+        pyfl_entry = PYFL_POPUP_ENTRY()
+        pyfl_entry.fl_handle = fl_entry
+        pyfl_entry.text = <str>fl_entry.text
+        pyfl_entry.val = fl_entry.val
+        result.append(pyfl_entry)
 
         fl_entry = <FL_POPUP_ENTRY*>fl_entry.next
         i += 1
     return result
+
+def pyfl_popup_entry_set_state(PYFL_POPUP_ENTRY entry, unsigned int state):
+    result = fl_popup_entry_set_state(entry.fl_handle, state)
+    return result
+

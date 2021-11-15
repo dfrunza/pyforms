@@ -420,71 +420,72 @@ cdef extern from "forms.h":
     ctypedef union XEvent:
         pass
 
+    # The `nogil` function annotation declares that it is safe to call the function with or without the GIL.
 
-    void* fl_initialize(int* na, char** arg, const char* appclass, void* appopt, int nappopt);
+    void* fl_initialize(int*, char**, const char*, void*, int) nogil;
 
-    FL_OBJECT* fl_add_button(int type, FL_Coord x, FL_Coord y, FL_Coord w, FL_Coord h, const char* label);
+    FL_OBJECT* fl_add_button(int, FL_Coord, FL_Coord, FL_Coord, FL_Coord, const char*) nogil;
 
-    FL_FORM* fl_bgn_form(int type, FL_Coord w, FL_Coord h);
+    FL_FORM* fl_bgn_form(int, FL_Coord, FL_Coord) nogil;
 
-    void fl_end_form();
+    void fl_end_form() nogil;
 
-    XID fl_show_form(FL_FORM* form, int place, int border, const char* name);
+    XID fl_show_form(FL_FORM*, int, int, const char*) nogil;
 
-    # The `nogil` function annotation declares that it is safe to call the function without the GIL.
-    # Note that it's allowed to execute it while holding the GIL as well.
     FL_OBJECT* fl_do_forms() nogil;
 
-    FL_OBJECT* fl_check_forms();
+    FL_OBJECT* fl_check_forms() nogil;
 
-    void fl_hide_form(FL_FORM* form);
+    void fl_hide_form(FL_FORM*) nogil;
 
-    FL_COLOR fl_get_form_background_color(FL_FORM* form);
+    FL_COLOR fl_get_form_background_color(FL_FORM*) nogil;
 
-    void fl_set_form_background_color(FL_FORM* form, FL_COLOR color);
+    void fl_set_form_background_color(FL_FORM*, FL_COLOR) nogil;
 
-    void fl_set_object_helper(FL_OBJECT* obj, const char* tip);
+    void fl_set_object_helper(FL_OBJECT*, const char*) nogil;
 
-    const char* fl_get_font_name(int n);
+    const char* fl_get_font_name(int) nogil;
 
-    int fl_set_font_name(int n, const char* name);
+    int fl_set_font_name(int, const char*) nogil;
 
-    void fl_set_object_color(FL_OBJECT* obj, FL_COLOR col1, FL_COLOR col2);
+    void fl_set_object_color(FL_OBJECT*, FL_COLOR, FL_COLOR) nogil;
 
-    ctypedef int (*FL_APPEVENT_CB)(XEvent*, void*);
+    ctypedef int (*FL_APPEVENT_CB)(XEvent*, void*) nogil;
 
-    FL_APPEVENT_CB fl_set_idle_callback(FL_APPEVENT_CB callback, void* user_data);
+    FL_APPEVENT_CB fl_set_idle_callback(FL_APPEVENT_CB, void*) nogil;
 
-    void fl_set_object_label(FL_OBJECT* obj, const char* label);
+    void fl_set_object_label(FL_OBJECT*, const char*) nogil;
 
-    void fl_set_object_lcol(FL_OBJECT* obj, FL_COLOR color);
+    void fl_set_object_lcol(FL_OBJECT*, FL_COLOR) nogil;
 
-    FL_OBJECT* fl_add_box(int type, FL_Coord x, FL_Coord y, FL_Coord w, FL_Coord h, const char* label);
+    FL_OBJECT* fl_add_box(int, FL_Coord, FL_Coord, FL_Coord, FL_Coord, const char*) nogil;
 
-    FL_OBJECT* fl_add_labelframe(int type, FL_Coord x, FL_Coord y, FL_Coord w, FL_Coord h, const char* label);
+    FL_OBJECT* fl_add_labelframe(int, FL_Coord, FL_Coord, FL_Coord, FL_Coord, const char*) nogil;
 
-    void fl_set_object_lalign(FL_OBJECT* obj, int align);
+    void fl_set_object_lalign(FL_OBJECT*, int) nogil;
 
-    ctypedef void (*FL_CALLBACKPTR)(FL_OBJECT*, long);
+    ctypedef void (*FL_CALLBACKPTR)(FL_OBJECT*, long) nogil;
 
-    FL_CALLBACKPTR fl_set_object_callback(FL_OBJECT* obj, FL_CALLBACKPTR callback, long argument);
+    FL_CALLBACKPTR fl_set_object_callback(FL_OBJECT*, FL_CALLBACKPTR, long) nogil;
 
-    void fl_deactivate_object(FL_OBJECT* obj);
+    void fl_deactivate_object(FL_OBJECT*) nogil;
 
-    void fl_activate_object(FL_OBJECT* obj);
+    void fl_activate_object(FL_OBJECT*) nogil;
 
-    int fl_object_is_active(FL_OBJECT* obj);
+    int fl_object_is_active(FL_OBJECT*) nogil;
 
-    void fl_set_object_boxtype(FL_OBJECT* obj, int boxtype);
+    void fl_set_object_boxtype(FL_OBJECT*, int) nogil;
 
-    void fl_set_icm_color(FL_COLOR, int r, int g, int b);
+    void fl_set_icm_color(FL_COLOR, int, int, int) nogil;
 
-    void fl_hide_object(FL_OBJECT* obj);
+    void fl_hide_object(FL_OBJECT*) nogil;
 
-    void fl_show_object(FL_OBJECT* obj);
+    void fl_show_object(FL_OBJECT*) nogil;
 
-    FL_OBJECT* fl_add_nmenu(int, FL_Coord, FL_Coord, FL_Coord, FL_Coord, const char*);
+    FL_OBJECT* fl_add_nmenu(int, FL_Coord, FL_Coord, FL_Coord, FL_Coord, const char*) nogil;
 
-    FL_POPUP_ENTRY* fl_add_nmenu_items(FL_OBJECT*, const char*, ...);
+    FL_POPUP_ENTRY* fl_add_nmenu_items(FL_OBJECT*, const char*, ...) nogil;
 
-    FL_POPUP_ENTRY* fl_set_nmenu_items(FL_OBJECT*, FL_POPUP_ITEM*);
+    FL_POPUP_ENTRY* fl_set_nmenu_items(FL_OBJECT*, FL_POPUP_ITEM*) nogil;
+
+    unsigned int fl_popup_entry_set_state(FL_POPUP_ENTRY *, unsigned int) nogil;
