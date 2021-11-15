@@ -13,8 +13,8 @@ setup(
             libraries = ['forms', 'X11', 'python3.6m'],
             include_dirs = ['runtime/include', 'runtime/include/python3.6m', 'xforms/lib/include'],
             library_dirs = ['runtime/lib', 'xforms/lib'],
-            #extra_compile_args = [],
-            #extra_link_args = []
+            # extra_compile_args = [],
+            # extra_link_args = []
         )],
         compiler_directives = {
             'language_level': '3',
@@ -22,6 +22,6 @@ setup(
             'c_string_encoding': 'ascii',
         },
         build_dir = 'build',
-        gdb_debug = True
+        # gdb_debug = True
     )
 )

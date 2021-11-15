@@ -17,10 +17,6 @@ cdef extern from "forms.h":
         pass
 
 
-    ctypedef struct FL_POPUP_ENTRY:
-        pass
-
-
     ctypedef struct FL_POPUP_RETURN:
         long int val             # value assigned to popup entry
         void* user_data          # pointer to user data
@@ -34,10 +30,19 @@ cdef extern from "forms.h":
     ctypedef int (*FL_POPUP_CB)(FL_POPUP_RETURN*);
 
 
+    ctypedef struct FL_POPUP_ENTRY:
+        FL_POPUP_ENTRY* prev     # next in linked list
+        FL_POPUP_ENTRY* next     # previous in linked list
+        char* text               # complete text of entry
+        long int val             # value associated with entry
+        void* user_data          # pointer to user data
+        FL_POPUP_CB callback     # callback for entry
+
+
     ctypedef struct FL_POPUP_ITEM:
-        const char* text               # text of entry
-        FL_POPUP_CB callback           # (selection) callback
-        const char* shortcut           # keyboard shortcut description
+        const char* text       # text of entry
+        FL_POPUP_CB callback   # (selection) callback
+        const char* shortcut   # keyboard shortcut description
         int type               # type of entry
         int state              # disabled, hidden, checked
 

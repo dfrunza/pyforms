@@ -1,8 +1,8 @@
+import sys, types
 from pyforms cimport *
 from cpython.array cimport array
-from libc.string cimport memcpy
-from enum import IntEnum
-import sys
+from cpython.mem cimport PyMem_Malloc, PyMem_Free
+from libc.string cimport memcpy, memset
 
 
 cdef class PYFL_FORM:
@@ -17,8 +17,13 @@ cdef class PYFL_POPUP_ENTRY:
     cdef FL_POPUP_ENTRY* fl_handle
 
 
+cdef class PYFL_POPUP_RETURN:
+    cdef FL_POPUP_RETURN* fl_handle
+
+
 cdef class PYFL_POPUP_ITEM:
     cdef FL_POPUP_ITEM fl_handle
+    cdef readonly long int val
     cdef public:
         str text
         object callback
@@ -455,12 +460,13 @@ def pyfl_set_object_color(PYFL_OBJECT obj, PYFL_COLOR col1, PYFL_COLOR col2):
     return
 
 
-cdef int _pyfl_idle_callback(XEvent* xevent, void* user_data) with gil:
-    (<object>user_data)()
+cdef int _pyfl_idle_callback(XEvent* xevent, void* callback) with gil:
+    (<object>callback)()
+    return FL_OK
 
 
-def pyfl_set_idle_callback(object user_callback):
-    fl_set_idle_callback(_pyfl_idle_callback, <void*>user_callback)
+def pyfl_set_idle_callback(object callback):
+    fl_set_idle_callback(_pyfl_idle_callback, <void*>callback)
     return
 
 
@@ -474,7 +480,7 @@ def pyfl_set_object_lcolor(PYFL_OBJECT obj, PYFL_COLOR color):
     return
 
 
-def pyfl_add_box(int type, PYFL_Coord x, PYFL_Coord y, PYFL_Coord w, PYFL_Coord h, str label):
+def pyfl_add_box(PYFL_BOX_TYPE type, PYFL_Coord x, PYFL_Coord y, PYFL_Coord w, PYFL_Coord h, str label):
     cdef PYFL_OBJECT result = PYFL_OBJECT()
     result.fl_handle = fl_add_box(type, x, y, w, h, <bytes>label)
     return result
@@ -493,10 +499,11 @@ def pyfl_set_object_lalign(PYFL_OBJECT obj, int align):
 
 cdef void _pyfl_set_object_callback(FL_OBJECT* obj, long argument) with gil:
     (<object>(<void*>argument))()
+    return
 
 
-def pyfl_set_object_callback(PYFL_OBJECT obj, object user_callback):
-    fl_set_object_callback(obj.fl_handle, _pyfl_set_object_callback, <long>(<void*>user_callback))
+def pyfl_set_object_callback(PYFL_OBJECT obj, object callback):
+    fl_set_object_callback(obj.fl_handle, _pyfl_set_object_callback, <long>(<void*>callback))
     return
 
 
@@ -542,20 +549,21 @@ cdef public enum:
     PYFL_BUTTON_TOUCH_NMENU = FL_BUTTON_TOUCH_NMENU
 
 
-def pyfl_add_nmenu(int typ, PYFL_Coord x, PYFL_Coord y, PYFL_Coord w, PYFL_Coord h, str label):
+def pyfl_add_nmenu(int type, PYFL_Coord x, PYFL_Coord y, PYFL_Coord w, PYFL_Coord h, str label):
     cdef PYFL_OBJECT result = PYFL_OBJECT()
-    result.fl_handle = fl_add_nmenu(typ, x, y, w, h, <bytes>label)
+    result.fl_handle = fl_add_nmenu(type, x, y, w, h, <bytes>label)
     return result
 
 
+#def pyfl_add_nmenu_items(PYFL_OBJECT obj, str items):
+#    fl_add_nmenu_items(obj.fl_handle, <bytes>items)
+#    return
+
+
 cdef int _pyfl_nmenu_popup_item_callback(FL_POPUP_RETURN* popup_return) with gil:
-    print("Got a HIT!")
+    cdef object callback = <object>(popup_return.user_data)
+    callback(popup_return.val)
     return PYFL_IGNORE
-
-
-def pyfl_add_nmenu_items(PYFL_OBJECT obj, str items):
-    fl_add_nmenu_items(obj.fl_handle, <bytes>items)
-    return
 
 
 def pyfl_set_nmenu_items(PYFL_OBJECT obj, list items):
@@ -570,8 +578,20 @@ def pyfl_set_nmenu_items(PYFL_OBJECT obj, list items):
         popup_item.fl_handle.type = popup_item.type
         popup_item.fl_handle.state = popup_item.state
 
-        memcpy(fl_items.data.as_uchars + offset, <void*>&popup_item.fl_handle, sizeof(FL_POPUP_ITEM))
+        memcpy(fl_items.data.as_uchars + offset, &popup_item.fl_handle, sizeof(FL_POPUP_ITEM))
         offset += sizeof(FL_POPUP_ITEM)
+
     cdef PYFL_POPUP_ENTRY result = PYFL_POPUP_ENTRY()
     result.fl_handle = fl_set_nmenu_items(obj.fl_handle, <FL_POPUP_ITEM*>fl_items.data.as_voidptr)
+    assert result.fl_handle != <FL_POPUP_ENTRY*>0
+    cdef FL_POPUP_ENTRY* fl_entry = result.fl_handle
+    i = 0
+    while fl_entry != <FL_POPUP_ENTRY*>0:
+        popup_item = items[i]
+        assert fl_entry.callback == &_pyfl_nmenu_popup_item_callback
+        fl_entry.user_data = <void*>popup_item.callback
+        popup_item.val = fl_entry.val
+
+        fl_entry = <FL_POPUP_ENTRY*>fl_entry.next
+        i += 1
     return result
