@@ -15,8 +15,14 @@ cdef class PYFL_OBJECT:
 
 cdef class PYFL_POPUP_ENTRY:
     cdef FL_POPUP_ENTRY* fl_handle
-    cdef readonly long int val
-    cdef readonly str text
+
+    @property
+    def val(self):
+        return self.fl_handle.val
+
+    @property
+    def text(self):
+        return <str>self.fl_handle.text
 
 
 cdef class PYFL_POPUP_RETURN:
@@ -25,15 +31,49 @@ cdef class PYFL_POPUP_RETURN:
 
 cdef class PYFL_POPUP_ITEM:
     cdef FL_POPUP_ITEM* fl_handle
+
+    @property
+    def text(self):
+        return <str>self.fl_handle.text
+
+    @text.setter
+    def text(self, value):
+        self.fl_handle.text = <bytes>value
+        return
+
+    @property
+    def shortcut(self):
+        return <str>self.fl_handle.shortcut
+
+    @shortcut.setter
+    def shortcut(self, value):
+        self.fl_handle.shortcut = <bytes>value
+        return
+
+    @property
+    def type(self):
+        return self.fl_handle.type
+
+    @type.setter
+    def type(self, value):
+        self.fl_handle.type = value
+        return
+
+    @property
+    def state(self):
+        return self.fl_handle.state
+
+    @state.setter
+    def state(self, value):
+        self.fl_handle.state = value
+        return
+
     cdef public:
-        str text
         object callback
-        str shortcut
-        int type
-        int state
 
     def __cinit__(self):
         self.fl_handle = <FL_POPUP_ITEM*>PyMem_Malloc(sizeof(FL_POPUP_ITEM))
+        memset(self.fl_handle, 0, sizeof(FL_POPUP_ITEM))
         return
 
     def __dealloc__(self):
@@ -582,11 +622,7 @@ def pyfl_set_nmenu_items(PYFL_OBJECT obj, list items):
     cdef int offset = 0
     for i in range(len(items)):
         popup_item = items[i]
-        popup_item.fl_handle.text = <bytes>popup_item.text if popup_item.text is not None else b'0'
         popup_item.fl_handle.callback = &_pyfl_nmenu_popup_item_callback
-        popup_item.fl_handle.shortcut = <bytes>popup_item.shortcut if popup_item.shortcut is not None else b'0'
-        popup_item.fl_handle.type = popup_item.type
-        popup_item.fl_handle.state = popup_item.state
 
         memcpy(fl_items.data.as_uchars + offset, popup_item.fl_handle, sizeof(FL_POPUP_ITEM))
         offset += sizeof(FL_POPUP_ITEM)
@@ -604,8 +640,6 @@ def pyfl_set_nmenu_items(PYFL_OBJECT obj, list items):
 
         pyfl_entry = PYFL_POPUP_ENTRY()
         pyfl_entry.fl_handle = fl_entry
-        pyfl_entry.text = <str>fl_entry.text
-        pyfl_entry.val = fl_entry.val
         result.append(pyfl_entry)
 
         fl_entry = <FL_POPUP_ENTRY*>fl_entry.next
