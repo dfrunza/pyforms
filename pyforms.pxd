@@ -408,6 +408,15 @@ cdef extern from "forms.h":
         FL_BUTTON_TOUCH_NMENU
 
 
+    # Resizing policies #
+
+    ctypedef enum FL_RESIZE_T:
+        FL_RESIZE_NONE,
+        FL_RESIZE_X,
+        FL_RESIZE_Y,
+        FL_RESIZE_ALL = (FL_RESIZE_X | FL_RESIZE_Y)
+
+
     ctypedef int FL_Coord
 
 
@@ -419,6 +428,7 @@ cdef extern from "forms.h":
 
     ctypedef union XEvent:
         pass
+
 
     # The `nogil` function annotation declares that it is safe to call the function with or without the GIL.
 
@@ -435,8 +445,14 @@ cdef extern from "forms.h":
     ctypedef int (*FL_FORM_ATCLOSE)(FL_FORM*, void*);
 
     FL_FORM_ATCLOSE fl_set_form_atclose(FL_FORM* form, FL_FORM_ATCLOSE fmclose, void* data);
+
+    FL_FORM_ATCLOSE fl_set_atclose(FL_FORM_ATCLOSE fmclose, void* data);
     
     void fl_set_app_mainform(FL_FORM* form);
+
+    void fl_deactivate_form(FL_FORM* form);
+
+    void fl_activate_form(FL_FORM* form);
 
     FL_OBJECT* fl_do_forms() nogil;
 
@@ -495,3 +511,9 @@ cdef extern from "forms.h":
     FL_POPUP_ENTRY* fl_set_nmenu_items(FL_OBJECT*, FL_POPUP_ITEM*) nogil;
 
     unsigned int fl_popup_entry_set_state(FL_POPUP_ENTRY *, unsigned int) nogil;
+
+    void fl_show_message(const char*, const char*, const char*);
+
+    void fl_show_messages(const char* );
+
+    void fl_set_object_resize(FL_OBJECT* ob, unsigned int what);

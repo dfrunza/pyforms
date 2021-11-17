@@ -8,9 +8,17 @@ from libc.string cimport memcpy, memset
 cdef class PYFL_FORM:
     cdef FL_FORM* fl_handle
 
+    @property
+    def fl_handle(self):
+        return <long>self.fl_handle
+
 
 cdef class PYFL_OBJECT:
     cdef FL_OBJECT* fl_handle
+
+    @property
+    def fl_handle(self):
+        return <long>self.fl_handle
 
 
 cdef class PYFL_POPUP_ENTRY:
@@ -416,6 +424,13 @@ cdef public enum PYFL_BUTTON_TYPE:
     PYFL_MENU_BUTTON       = FL_MENU_BUTTON
 
 
+cdef public enum PYFL_RESIZE_TYPE:
+    PYFL_RESIZE_NONE = FL_RESIZE_NONE,
+    PYFL_RESIZE_X    = FL_RESIZE_X,
+    PYFL_RESIZE_Y    = FL_RESIZE_Y,
+    PYFL_RESIZE_ALL  = FL_RESIZE_ALL
+
+
 ctypedef int PYFL_Coord 
 
 
@@ -464,7 +479,7 @@ def pyfl_show_form(PYFL_FORM form, PYFL_PLACE place, PYFL_BORDER border, str nam
 
 cdef int _pyfl_form_atclose(FL_FORM* form, void* user_data) with gil:
     cdef callback = <object>user_data
-    result = callback()
+    result = callback(<long>form)
     return result
 
 
@@ -473,8 +488,29 @@ def pyfl_set_form_atclose(PYFL_FORM form, object callback):
     return
 
 
+cdef int _pyfl_atclose(FL_FORM* form, void* user_data) with gil:
+    cdef callback = <object>user_data
+    result = callback(<long>form)
+    return result
+
+
+def pyfl_set_atclose(object callback):
+    fl_set_atclose(_pyfl_atclose, <void*>callback)
+    return
+
+
 def pyfl_set_app_mainform(PYFL_FORM form):
     fl_set_app_mainform(form.fl_handle)
+    return
+
+
+def pyfl_deactivate_form(PYFL_FORM form):
+    fl_deactivate_form(form.fl_handle)
+    return
+
+
+def pyfl_activate_form(PYFL_FORM form):
+    fl_activate_form(form.fl_handle)
     return
 
 
@@ -669,3 +705,17 @@ def pyfl_popup_entry_set_state(PYFL_POPUP_ENTRY entry, unsigned int state):
     result = fl_popup_entry_set_state(entry.fl_handle, state)
     return result
 
+
+def pyfl_show_message(str s1, str s2, str s3):
+    fl_show_message(<bytes>s1, <bytes>s2, <bytes>s3)
+    return
+
+
+def pyfl_show_messages(str s):
+    fl_show_messages(<bytes>s)
+    return
+
+
+def pyfl_set_object_resize(PYFL_OBJECT obj, unsigned int what):
+    fl_set_object_resize(obj.fl_handle, what);
+    return
