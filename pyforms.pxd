@@ -432,6 +432,12 @@ cdef extern from "forms.h":
 
     XID fl_show_form(FL_FORM*, int, int, const char*) nogil;
 
+    ctypedef int (*FL_FORM_ATCLOSE)(FL_FORM*, void*);
+
+    FL_FORM_ATCLOSE fl_set_form_atclose(FL_FORM* form, FL_FORM_ATCLOSE fmclose, void* data);
+    
+    void fl_set_app_mainform(FL_FORM* form);
+
     FL_OBJECT* fl_do_forms() nogil;
 
     FL_OBJECT* fl_check_forms() nogil;

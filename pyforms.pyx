@@ -462,6 +462,22 @@ def pyfl_show_form(PYFL_FORM form, PYFL_PLACE place, PYFL_BORDER border, str nam
     return result
 
 
+cdef int _pyfl_form_atclose(FL_FORM* form, void* user_data) with gil:
+    cdef callback = <object>user_data
+    result = callback()
+    return result
+
+
+def pyfl_set_form_atclose(PYFL_FORM form, object callback):
+    fl_set_form_atclose(form.fl_handle, _pyfl_form_atclose, <void*>callback)
+    return
+
+
+def pyfl_set_app_mainform(PYFL_FORM form):
+    fl_set_app_mainform(form.fl_handle)
+    return
+
+
 def pyfl_do_forms():
     cdef PYFL_OBJECT result = PYFL_OBJECT()
     with nogil:
@@ -510,8 +526,9 @@ def pyfl_set_object_color(PYFL_OBJECT obj, PYFL_COLOR col1, PYFL_COLOR col2):
     return
 
 
-cdef int _pyfl_idle_callback(XEvent* xevent, void* callback) with gil:
-    (<object>callback)()
+cdef int _pyfl_idle_callback(XEvent* xevent, void* user_data) with gil:
+    cdef object callback = <object>user_data
+    callback()
     return FL_OK
 
 
@@ -547,13 +564,14 @@ def pyfl_set_object_lalign(PYFL_OBJECT obj, int align):
     return
 
 
-cdef void _pyfl_set_object_callback(FL_OBJECT* obj, long argument) with gil:
-    (<object>(<void*>argument))()
+cdef void _pyfl_object_callback(FL_OBJECT* obj, long argument) with gil:
+    cdef object callback = <object>(<void*>argument)
+    callback()
     return
 
 
 def pyfl_set_object_callback(PYFL_OBJECT obj, object callback):
-    fl_set_object_callback(obj.fl_handle, _pyfl_set_object_callback, <long>(<void*>callback))
+    fl_set_object_callback(obj.fl_handle, _pyfl_object_callback, <long>(<void*>callback))
     return
 
 
@@ -645,6 +663,7 @@ def pyfl_set_nmenu_items(PYFL_OBJECT obj, list items):
         fl_entry = <FL_POPUP_ENTRY*>fl_entry.next
         i += 1
     return result
+
 
 def pyfl_popup_entry_set_state(PYFL_POPUP_ENTRY entry, unsigned int state):
     result = fl_popup_entry_set_state(entry.fl_handle, state)
