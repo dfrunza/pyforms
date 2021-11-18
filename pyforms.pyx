@@ -478,13 +478,16 @@ def pyfl_show_form(PYFL_FORM form, PYFL_PLACE place, PYFL_BORDER border, str nam
 
 
 cdef int _pyfl_form_atclose(FL_FORM* form, void* user_data) with gil:
-    cdef callback = <object>user_data
-    result = callback(<long>form)
+    cdef CallbackParams* params = <CallbackParams*>user_data
+    result = (<object>params.python_callable)(<long>form, <long>params.user_data)
     return result
 
 
 def pyfl_set_form_atclose(PYFL_FORM form, object callback):
-    fl_set_form_atclose(form.fl_handle, _pyfl_form_atclose, <void*>callback)
+    cdef CallbackParams* params = <CallbackParams*>PyMem_Malloc(sizeof(CallbackParams))  # FIXME: Memory leak.
+    params.python_callable = <void*>callback
+    params.user_data = <void*>form.fl_handle
+    fl_set_form_atclose(form.fl_handle, _pyfl_form_atclose, <void*>params)
     return
 
 

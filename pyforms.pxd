@@ -442,17 +442,17 @@ cdef extern from "forms.h":
 
     XID fl_show_form(FL_FORM*, int, int, const char*) nogil;
 
-    ctypedef int (*FL_FORM_ATCLOSE)(FL_FORM*, void*);
+    ctypedef int (*FL_FORM_ATCLOSE)(FL_FORM*, void*) nogil;
 
-    FL_FORM_ATCLOSE fl_set_form_atclose(FL_FORM* form, FL_FORM_ATCLOSE fmclose, void* data);
+    FL_FORM_ATCLOSE fl_set_form_atclose(FL_FORM* form, FL_FORM_ATCLOSE fmclose, void* data) nogil;
 
-    FL_FORM_ATCLOSE fl_set_atclose(FL_FORM_ATCLOSE fmclose, void* data);
+    FL_FORM_ATCLOSE fl_set_atclose(FL_FORM_ATCLOSE fmclose, void* data) nogil;
     
-    void fl_set_app_mainform(FL_FORM* form);
+    void fl_set_app_mainform(FL_FORM* form) nogil;
 
-    void fl_deactivate_form(FL_FORM* form);
+    void fl_deactivate_form(FL_FORM* form) nogil;
 
-    void fl_activate_form(FL_FORM* form);
+    void fl_activate_form(FL_FORM* form) nogil;
 
     FL_OBJECT* fl_do_forms() nogil;
 
@@ -512,8 +512,14 @@ cdef extern from "forms.h":
 
     unsigned int fl_popup_entry_set_state(FL_POPUP_ENTRY *, unsigned int) nogil;
 
-    void fl_show_message(const char*, const char*, const char*);
+    void fl_show_message(const char*, const char*, const char*) nogil;
 
-    void fl_show_messages(const char* );
+    void fl_show_messages(const char* ) nogil;
 
-    void fl_set_object_resize(FL_OBJECT* ob, unsigned int what);
+    void fl_set_object_resize(FL_OBJECT* ob, unsigned int what) nogil;
+
+
+cdef struct CallbackParams:
+    void* python_callable
+    void* user_data
+
