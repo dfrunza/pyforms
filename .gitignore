@@ -4,6 +4,9 @@ build/*
 *.so
 *.o
 
+pyforms.c
+pyforms.h
+
 xforms/libtool
 xforms/lib/include/AAA.h
 xforms/lib/include/forms.h
