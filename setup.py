@@ -10,7 +10,7 @@ setup(
 
     ext_modules = cythonize([
         Extension('pyforms', ['pyforms.pyx'],
-            libraries = ['forms', 'X11', 'python3.6m'],
+            libraries = ['forms', 'X11', 'python3.8'],
             include_dirs = ['runtime/include', 'runtime/include/python3.6m', 'xforms/lib/include'],
             library_dirs = ['runtime/lib', 'xforms/lib'],
             # extra_compile_args = [],
@@ -18,8 +18,6 @@ setup(
         )],
         compiler_directives = {
             'language_level': '3',
-            'c_string_type': 'str',
-            'c_string_encoding': 'ascii',
         },
         build_dir = 'build',
         # gdb_debug = True
