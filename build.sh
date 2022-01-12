@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Compile XForms with :
+#    $ CFLAGS=-fPIC ./configure --prefix=/usr/local --disable-shared --enable-static
+
 BASE=$PWD
 
 #mkdir -p $BASE/build
