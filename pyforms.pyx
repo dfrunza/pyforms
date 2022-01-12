@@ -30,7 +30,7 @@ cdef class PYFL_POPUP_ENTRY:
 
     @property
     def text(self):
-        return <str>self.fl_handle.text
+        return self.fl_handle.text
 
 
 cdef class PYFL_POPUP_RETURN:
@@ -39,23 +39,27 @@ cdef class PYFL_POPUP_RETURN:
 
 cdef class PYFL_POPUP_ITEM:
     cdef FL_POPUP_ITEM* fl_handle
+    cdef bytes text
+    cdef public object callback
 
     @property
     def text(self):
-        return <str>self.fl_handle.text
+        assert self.text == self.fl_handle.text
+        return self.text
 
     @text.setter
-    def text(self, value):
-        self.fl_handle.text = <bytes>value
+    def text(self, bytes value):
+        self.text = value
+        self.fl_handle.text = value
         return
 
     @property
     def shortcut(self):
-        return <str>self.fl_handle.shortcut
+        return self.fl_handle.shortcut
 
     @shortcut.setter
-    def shortcut(self, value):
-        self.fl_handle.shortcut = <bytes>value
+    def shortcut(self, bytes value):
+        self.fl_handle.shortcut = value
         return
 
     @property
@@ -63,7 +67,7 @@ cdef class PYFL_POPUP_ITEM:
         return self.fl_handle.type
 
     @type.setter
-    def type(self, value):
+    def type(self, int value):
         self.fl_handle.type = value
         return
 
@@ -72,12 +76,9 @@ cdef class PYFL_POPUP_ITEM:
         return self.fl_handle.state
 
     @state.setter
-    def state(self, value):
+    def state(self, int value):
         self.fl_handle.state = value
         return
-
-    cdef public:
-        object callback
 
     def __cinit__(self):
         self.fl_handle = <FL_POPUP_ITEM*>PyMem_Malloc(sizeof(FL_POPUP_ITEM))
@@ -447,11 +448,11 @@ cdef class PyXEvent:
 ctypedef int PYFL_BORDER
 
 
-def pyfl_initialize(str appclass):
+def pyfl_initialize(bytes appclass):
     cdef int argc = 1
     cdef array argv = array('B', sys.argv[0].encode())
     PyEval_InitThreads()
-    fl_initialize(&argc, <char**>&argv.data.as_voidptr, <bytes>appclass, <void*>0, 0)
+    fl_initialize(&argc, <char**>&argv.data.as_voidptr, appclass, <void*>0, 0)
     return
 
 
@@ -461,9 +462,9 @@ def pyfl_bgn_form(int type, PYFL_Coord w, PYFL_Coord h):
     return result
 
 
-def pyfl_add_button(int type, PYFL_Coord x, PYFL_Coord y, PYFL_Coord w, PYFL_Coord h, str label):
+def pyfl_add_button(int type, PYFL_Coord x, PYFL_Coord y, PYFL_Coord w, PYFL_Coord h, bytes label):
     cdef PYFL_OBJECT result = PYFL_OBJECT()
-    result.fl_handle = fl_add_button(type, x, y, w, h, <bytes>label)
+    result.fl_handle = fl_add_button(type, x, y, w, h, label)
     return result
 
 
@@ -472,8 +473,8 @@ def pyfl_end_form():
     return
 
 
-def pyfl_show_form(PYFL_FORM form, PYFL_PLACE place, PYFL_BORDER border, str name):
-    cdef PYXID result = fl_show_form(form.fl_handle, place, border, <bytes>name)
+def pyfl_show_form(PYFL_FORM form, PYFL_PLACE place, PYFL_BORDER border, bytes name):
+    cdef PYXID result = fl_show_form(form.fl_handle, place, border, name)
     return result
 
 
@@ -545,8 +546,8 @@ def pyfl_set_form_background_color(PYFL_FORM form, PYFL_COLOR color):
     return
 
 
-def pyfl_set_object_helper(PYFL_OBJECT obj, str tip):
-    fl_set_object_helper(obj.fl_handle, <bytes>tip)
+def pyfl_set_object_helper(PYFL_OBJECT obj, bytes tip):
+    fl_set_object_helper(obj.fl_handle, tip)
     return
 
 
@@ -555,8 +556,8 @@ def pyfl_get_font_name(int n):
     return result
 
 
-def pyfl_set_font_name(int n, str name):
-    result = fl_set_font_name(n, <bytes>name)
+def pyfl_set_font_name(int n, bytes name):
+    result = fl_set_font_name(n, name)
     return result
 
 
@@ -576,8 +577,8 @@ def pyfl_set_idle_callback(object callback):
     return
 
 
-def pyfl_set_object_label(PYFL_OBJECT obj, str label):
-    fl_set_object_label(obj.fl_handle, <bytes>label)
+def pyfl_set_object_label(PYFL_OBJECT obj, bytes label):
+    fl_set_object_label(obj.fl_handle, label)
     return
 
 
@@ -586,15 +587,15 @@ def pyfl_set_object_lcolor(PYFL_OBJECT obj, PYFL_COLOR color):
     return
 
 
-def pyfl_add_box(PYFL_BOX_TYPE type, PYFL_Coord x, PYFL_Coord y, PYFL_Coord w, PYFL_Coord h, str label):
+def pyfl_add_box(PYFL_BOX_TYPE type, PYFL_Coord x, PYFL_Coord y, PYFL_Coord w, PYFL_Coord h, bytes label):
     cdef PYFL_OBJECT result = PYFL_OBJECT()
-    result.fl_handle = fl_add_box(type, x, y, w, h, <bytes>label)
+    result.fl_handle = fl_add_box(type, x, y, w, h, label)
     return result
 
 
-def pyfl_add_labelframe(int type, PYFL_Coord x, PYFL_Coord y, PYFL_Coord w, PYFL_Coord h, str label):
+def pyfl_add_labelframe(int type, PYFL_Coord x, PYFL_Coord y, PYFL_Coord w, PYFL_Coord h, bytes label):
     cdef PYFL_OBJECT result = PYFL_OBJECT()
-    result.fl_handle = fl_add_labelframe(type, x, y, w, h, <bytes>label)
+    result.fl_handle = fl_add_labelframe(type, x, y, w, h, label)
     return result
 
 
@@ -656,14 +657,14 @@ cdef public enum:
     PYFL_BUTTON_TOUCH_NMENU = FL_BUTTON_TOUCH_NMENU
 
 
-def pyfl_add_nmenu(int type, PYFL_Coord x, PYFL_Coord y, PYFL_Coord w, PYFL_Coord h, str label):
+def pyfl_add_nmenu(int type, PYFL_Coord x, PYFL_Coord y, PYFL_Coord w, PYFL_Coord h, bytes label):
     cdef PYFL_OBJECT result = PYFL_OBJECT()
-    result.fl_handle = fl_add_nmenu(type, x, y, w, h, <bytes>label)
+    result.fl_handle = fl_add_nmenu(type, x, y, w, h, label)
     return result
 
 
-#def pyfl_add_nmenu_items(PYFL_OBJECT obj, str items):
-#    fl_add_nmenu_items(obj.fl_handle, <bytes>items)
+#def pyfl_add_nmenu_items(PYFL_OBJECT obj, bytes items):
+#    fl_add_nmenu_items(obj.fl_handle, items)
 #    return
 
 
@@ -709,13 +710,13 @@ def pyfl_popup_entry_set_state(PYFL_POPUP_ENTRY entry, unsigned int state):
     return result
 
 
-def pyfl_show_message(str s1, str s2, str s3):
-    fl_show_message(<bytes>s1, <bytes>s2, <bytes>s3)
+def pyfl_show_message(bytes s1, bytes s2, bytes s3):
+    fl_show_message(s1, s2, s3)
     return
 
 
-def pyfl_show_messages(str s):
-    fl_show_messages(<bytes>s)
+def pyfl_show_messages(bytes s):
+    fl_show_messages(s)
     return
 
 
