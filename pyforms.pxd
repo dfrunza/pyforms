@@ -5,8 +5,19 @@ cdef extern from "Python.h":
 
 cdef extern from "forms.h":
 
+    ctypedef int FL_Coord
+
+    ctypedef unsigned long FL_COLOR
+
+    ctypedef unsigned long XID
+
+
     ctypedef struct FL_FORM:
-        pass
+        # current obj. location and size
+        FL_Coord x
+        FL_Coord y
+        FL_Coord w
+        FL_Coord h
 
 
     ctypedef struct FL_OBJECT:
@@ -417,15 +428,6 @@ cdef extern from "forms.h":
         FL_RESIZE_ALL = (FL_RESIZE_X | FL_RESIZE_Y)
 
 
-    ctypedef int FL_Coord
-
-
-    ctypedef unsigned long FL_COLOR
-
-
-    ctypedef unsigned long XID
-
-
     ctypedef union XEvent:
         pass
 
@@ -441,6 +443,8 @@ cdef extern from "forms.h":
     void fl_end_form() nogil;
 
     XID fl_show_form(FL_FORM*, int, int, const char*) nogil;
+
+    void fl_set_form_position(FL_FORM* form, FL_Coord x, FL_Coord y); 
 
     ctypedef int (*FL_FORM_ATCLOSE)(FL_FORM*, void*) nogil;
 

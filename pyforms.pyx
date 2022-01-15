@@ -12,6 +12,22 @@ cdef class PYFL_FORM:
     def fl_handle(self):
         return <long>self.fl_handle
 
+    @property
+    def x(self):
+        return self.fl_handle.x
+
+    @property
+    def y(self):
+        return self.fl_handle.y
+
+    @property
+    def w(self):
+        return self.fl_handle.w
+
+    @property
+    def h(self):
+        return self.fl_handle.h
+
 
 cdef class PYFL_OBJECT:
     cdef FL_OBJECT* fl_handle
@@ -476,6 +492,10 @@ def pyfl_end_form():
 def pyfl_show_form(PYFL_FORM form, PYFL_PLACE place, PYFL_BORDER border, bytes name):
     cdef PYXID result = fl_show_form(form.fl_handle, place, border, name)
     return result
+
+def pyfl_set_form_position(PYFL_FORM form, PYFL_Coord x, PYFL_Coord y):
+    fl_set_form_position(form.fl_handle, x, y);
+    return
 
 
 cdef int _pyfl_form_atclose(FL_FORM* form, void* user_data) with gil:
